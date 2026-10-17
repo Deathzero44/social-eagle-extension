@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>社媒采集到 Eagle</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="panel">
+    <header>
+      <div class="brand-mark">E</div>
+      <div><h1>社媒采集到 Eagle</h1><p>保存小红书与 Instagram 帖子的媒体和正文</p></div>
+    </header>
+
+    <label class="field-label" for="token">Eagle Token</label>
+    <div class="token-field">
+      <input id="token" type="password" autocomplete="off" placeholder="在 Eagle 开发者设置中获取">
+      <button id="toggle-token" class="text-button" type="button">显示</button>
+    </div>
+    <p class="hint">Token 只保存在此扩展的本地存储中，用于连接本机 Eagle。</p>
+
+    <section class="options" aria-label="采集选项">
+      <label class="check-row"><input id="auto-tags" type="checkbox"><span><strong>保存正文话题标签</strong><small>将帖子中的 #话题 添加为 Eagle 标签</small></span></label>
+      <label class="check-row"><input id="author-tag" type="checkbox"><span><strong>添加作者标签</strong><small>将作者名称作为 Eagle 标签</small></span></label>
+    </section>
+
+    <label class="field-label" for="folder-id">默认文件夹 ID <span>可选</span></label>
+    <input id="folder-id" class="full-input" type="text" autocomplete="off" placeholder="留空时使用 Eagle 当前默认位置">
+    <button id="save" class="save-button" type="button">保存设置</button>
+    <div id="message" class="message" role="status" aria-live="polite"></div>
+    <footer>请保持 Eagle 在本机运行，并在设置中启用本地 API。</footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

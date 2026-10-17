@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "社媒采集到 Eagle",
+  "version": "0.3.11",
+  "description": "从小红书、Instagram 和 X 帖子采集图片、视频、正文和原网址到 Eagle。",
+  "permissions": ["storage", "downloads"],
+  "host_permissions": [
+    "https://www.xiaohongshu.com/*",
+    "https://*.xiaohongshu.com/*",
+    "https://*.xhscdn.com/*",
+    "https://www.instagram.com/*",
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://pbs.twimg.com/*",
+    "https://video.twimg.com/*",
+    "http://localhost:41595/*",
+    "http://127.0.0.1:41595/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "社媒采集到 Eagle",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.xiaohongshu.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.instagram.com/*"],
+      "js": ["instagram-media.js", "instagram-content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["x-content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/eagle_white.png", "icons/eagle_mark.png", "icons/eagle-x.svg"],
+      "matches": ["https://www.xiaohongshu.com/*", "https://www.instagram.com/*", "https://x.com/*", "https://twitter.com/*"]
+    }
+  ]
+}
