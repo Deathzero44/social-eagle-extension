@@ -7,6 +7,10 @@ const DEFAULT_SETTINGS = {
 
 const EAGLE_API = "http://localhost:41595/api/item/addFromURL";
 const EAGLE_PATH_API = "http://localhost:41595/api/item/addFromPath";
+const EAGLE_INFO_APIS = [
+  "http://localhost:41595/api/application/info",
+  "http://127.0.0.1:41595/api/application/info"
+];
 const downloadWaiters = new Map();
 
 chrome.downloads?.onChanged.addListener((delta) => {
@@ -39,6 +43,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 async function importPost(payload) {
+  const eagleStatus = await checkEagleConnection();
+  if (!eagleStatus.ok) return eagleStatus;
+
   const settings = { ...DEFAULT_SETTINGS, ...(await chrome.storage.local.get(DEFAULT_SETTINGS)) };
   if (!settings.eagleToken.trim()) {
     return { ok: false, error: "请先在扩展弹窗中填写 Eagle Token。" };
@@ -114,6 +121,36 @@ async function importPost(payload) {
     total: results.length,
     error: imported > 0 ? `部分导入成功；${firstError}` : firstError
   };
+}
+
+async function checkEagleConnection() {
+  const abort = new AbortController();
+  const timeout = setTimeout(() => abort.abort(), 2500);
+  const checks = EAGLE_INFO_APIS.map(async (endpoint) => {
+    const response = await fetch(endpoint, {
+      method: "GET",
+      cache: "no-store",
+      signal: abort.signal
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const result = await response.json();
+    if (result?.status !== "success") throw new Error(result?.message || "Eagle API 未就绪");
+    return true;
+  });
+
+  try {
+    await Promise.any(checks);
+    return { ok: true };
+  } catch {
+    return {
+      ok: false,
+      errorCode: "EAGLE_UNAVAILABLE",
+      error: "无法连接到 Eagle。本机 Eagle 尚未启动时，请先打开 Eagle；如果已经打开，请检查 Eagle 设置中是否启用了本地 API，然后重试。"
+    };
+  } finally {
+    clearTimeout(timeout);
+    abort.abort();
+  }
 }
 
 async function importRemoteVideo(platform, url, itemBody, index) {

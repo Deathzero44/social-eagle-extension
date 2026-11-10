@@ -102,6 +102,10 @@
         } else {
           label.textContent = "导入失败";
           button.title = result?.error || "请检查 Eagle 是否运行以及扩展设置";
+          if (result?.errorCode === "EAGLE_UNAVAILABLE") {
+            button.title = "尚未打开 Eagle";
+            globalThis.SocialEagleDialog?.showEagleNotOpenedDialog();
+          }
         }
       } catch (error) {
         label.textContent = "导入失败";

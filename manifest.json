@@ -26,23 +26,32 @@
   "content_scripts": [
     {
       "matches": ["https://www.xiaohongshu.com/*"],
-      "js": ["content.js"],
+      "js": ["eagle-dialog.js", "content.js"],
       "run_at": "document_idle"
     },
     {
       "matches": ["https://www.instagram.com/*"],
-      "js": ["instagram-media.js", "instagram-content.js"],
+      "js": ["eagle-dialog.js", "instagram-media.js", "instagram-content.js"],
       "run_at": "document_idle"
     },
     {
       "matches": ["https://x.com/*", "https://twitter.com/*"],
-      "js": ["x-content.js"],
+      "js": ["eagle-dialog.js", "x-content.js"],
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["icons/eagle_white.png", "icons/eagle_mark.png", "icons/eagle-x.svg"],
+      "resources": [
+        "icons/eagle_white.png",
+        "icons/eagle_mark.png",
+        "icons/eagle-x.svg",
+        "eagle-dialog/index.html",
+        "eagle-dialog/dialog.css",
+        "eagle-dialog/dialog.js",
+        "eagle-opener/index.html",
+        "eagle-opener/open.js"
+      ],
       "matches": ["https://www.xiaohongshu.com/*", "https://www.instagram.com/*", "https://x.com/*", "https://twitter.com/*"]
     }
   ]

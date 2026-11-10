@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>尚未打开 Eagle</title>
+    <link rel="stylesheet" href="dialog.css">
+  </head>
+  <body>
+    <main class="backdrop" id="backdrop">
+      <section class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-description">
+        <div class="brand" aria-hidden="true">
+          <img src="../icons/eagle_mark.png" alt="">
+          <span class="warning">!</span>
+        </div>
+        <div class="body">
+          <h1 id="dialog-title">尚未打开 Eagle</h1>
+          <p id="dialog-description">需要打开 Eagle 应用程序才能使用扩展。若已经打开但仍无法使用，可能是代理工具造成的网络异常，建议关闭代理后重试，<a href="https://docs-cn.eagle.cool/article/9-why-does-the-browser-extension-not-working" target="_blank" rel="noopener">了解详情</a>。</p>
+          <div class="actions">
+            <button id="cancel" type="button">取消</button>
+            <button id="open-eagle" type="button">打开 Eagle</button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="dialog.js"></script>
+  </body>
+</html>

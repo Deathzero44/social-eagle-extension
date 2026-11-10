@@ -383,6 +383,14 @@
         const payload = await collectPost(livePost, context.root, mediaRegion);
         status.textContent = `正在导入 ${payload.media.length} 项媒体到 Eagle…`;
         const result = await chrome.runtime.sendMessage({ type: "IMPORT_IG_POST", payload });
+        if (!result?.ok && result?.errorCode === "EAGLE_UNAVAILABLE") {
+          button.dataset.state = "error";
+          button.title = "尚未打开 Eagle";
+          host.dataset.result = "error";
+          delete host.dataset.status;
+          globalThis.SocialEagleDialog?.showEagleNotOpenedDialog();
+          return;
+        }
         if (result?.ok && !result.error) {
           button.dataset.state = "success";
           button.title = `已导入 ${result.imported} 项到 Eagle`;

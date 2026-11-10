@@ -97,10 +97,13 @@
       '.eagle-mark{display:block;width:var(--eagle-icon-width,18px);height:var(--eagle-icon-height,18px);object-fit:contain;flex:none;opacity:.5}' +
       ':host([data-state="loading"]) .eagle-mark{animation:spin .9s linear infinite}' +
       ':host([data-state="success"]) button{box-shadow:inset 0 0 0 2px #00a86b}:host([data-state="error"]) button{box-shadow:inset 0 0 0 2px #e0245e}' +
+      '.status{position:absolute;top:34px;left:0;display:none;width:max-content;max-width:min(340px,65vw);padding:9px 12px;border:1px solid rgba(255,255,255,.16);border-radius:9px;color:#fff;background:rgba(18,20,24,.96);box-shadow:0 3px 12px rgba(0,0,0,.25);font:12px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;white-space:normal;overflow-wrap:anywhere;z-index:2147483647}' +
+      ':host([data-status]) .status{display:block}:host([data-state="error"]) .status{border-color:#e0245e}' +
       '@keyframes spin{to{transform:rotate(360deg)}}' +
       '</style><button type="button" aria-label="导入到 Eagle" title="导入到 Eagle">' +
-      '<img class="eagle-mark" alt="" src="' + eagleSvgUrl + '"></button>';
-    actions.set(host, { button: shadow.querySelector("button"), article, id, busy: false });
+      '<img class="eagle-mark" alt="" src="' + eagleSvgUrl + '"></button>' +
+      '<span class="status" role="status" aria-live="polite"></span>';
+    actions.set(host, { button: shadow.querySelector("button"), status: shadow.querySelector(".status"), article, id, busy: false });
     return host;
   }
 
@@ -110,12 +113,20 @@
     action.busy = true;
     action.button.disabled = true;
     action.button.title = "正在读取推文媒体和正文…";
+    delete host.dataset.status;
     host.dataset.state = "loading";
     try {
       const article = host.closest("article");
       if (!article || !article.isConnected) throw new Error("这条推文已经从信息流中移除，请稍后重试。");
       const payload = await collectPost(article, action.id);
       const result = await chrome.runtime.sendMessage({ type: "IMPORT_X_POST", payload });
+      if (result?.errorCode === "EAGLE_UNAVAILABLE") {
+        host.dataset.state = "error";
+        action.button.title = "尚未打开 Eagle";
+        action.button.setAttribute("aria-label", action.button.title);
+        globalThis.SocialEagleDialog?.showEagleNotOpenedDialog();
+        return;
+      }
       if (!result || !result.ok) throw new Error(result && result.error || "导入失败，请检查 Eagle 是否运行及扩展设置。");
       host.dataset.state = "success";
       action.button.title = result.error
@@ -126,12 +137,15 @@
       host.dataset.state = "error";
       action.button.title = error && error.message || "导入失败";
       action.button.setAttribute("aria-label", action.button.title);
+      action.status.textContent = action.button.title;
+      host.dataset.status = "visible";
     } finally {
       action.busy = false;
       action.button.disabled = false;
       window.setTimeout(() => {
         if (!host.isConnected) return;
         delete host.dataset.state;
+        delete host.dataset.status;
         action.button.title = "导入到 Eagle";
         action.button.setAttribute("aria-label", "导入到 Eagle");
       }, 8000);
